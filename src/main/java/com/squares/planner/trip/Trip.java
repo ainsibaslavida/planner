@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Entity(name = "trips")
+@Table(name = "trips")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
