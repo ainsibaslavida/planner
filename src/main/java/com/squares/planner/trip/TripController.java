@@ -4,10 +4,10 @@ import com.squares.planner.participant.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/trips")
@@ -25,5 +25,12 @@ public class TripController {
         this.participantService.registerParticipantsToEvent(tripRequestPayload.emails_to_invite(), newTrip.getId());
 
         return new ResponseEntity<>(new TripCreateResponse(String.valueOf(createdTrip.getId())), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Trip> getTripDetails(@PathVariable UUID id) {
+        Optional<Trip> requestedTrip = this.tripRepository.findById(id);
+
+        return requestedTrip.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
