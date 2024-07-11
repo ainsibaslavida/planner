@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,5 +34,23 @@ public class TripController {
         Optional<Trip> requestedTrip = this.tripRepository.findById(id);
 
         return requestedTrip.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Trip> updateTrip(@PathVariable UUID id, @RequestBody TripRequestPayload updatedTrip) throws Exception {
+        Optional<Trip> requestedTrip = this.tripRepository.findById(id);
+
+        if (requestedTrip.isEmpty()) {
+            throw new Exception("the trip does not exist.");
+        }
+
+        Trip updateTrip = requestedTrip.get();
+        updateTrip.setStartsAt(LocalDateTime.parse(updatedTrip.starts_at(), DateTimeFormatter.ISO_DATE_TIME));
+        updateTrip.setEndsAt(LocalDateTime.parse(updatedTrip.ends_at(), DateTimeFormatter.ISO_DATE_TIME));
+        updateTrip.setDestination(updatedTrip.destination());
+
+        this.tripRepository.save(updateTrip);
+
+        return new ResponseEntity<>(updateTrip, HttpStatus.OK);
     }
 }
